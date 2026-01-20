@@ -6,12 +6,21 @@ from pathlib import Path
 
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from utils import fetch_data
+from utils import fetch_data, get_minio_data
 
 
 def show():
     st.header("Distributions Statistiques")
-    df_dist = fetch_data("/api/distribution")
+    df_dist, time_mongo = fetch_data("/api/distribution")
+    _, time_minio = get_minio_data("gold", "kpi_distribution")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("MongoDB", f"{time_mongo:.0f}ms")
+    with col2:
+        st.metric("MinIO", f"{time_minio:.0f}ms")
+    
+    st.divider()
     
     if not df_dist.empty:
         col1, col2 = st.columns(2)

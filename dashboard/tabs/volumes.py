@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from utils import fetch_data
+from utils import fetch_data, get_minio_data
 
 
 def show():
@@ -16,7 +16,16 @@ def show():
     
     with sub_tabs[0]:
         st.subheader("Volumes par Jour")
-        df_jour = fetch_data("/api/volumes_jour")
+        df_jour, time_mongo = fetch_data("/api/volumes_jour")
+        _, time_minio = get_minio_data("gold", "kpi_volumes_jour")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("MongoDB", f"{time_mongo:.0f}ms")
+        with col2:
+            st.metric("MinIO", f"{time_minio:.0f}ms")
+        
+        st.divider()
         
         if not df_jour.empty:
             if 'jour' in df_jour.columns:
@@ -29,7 +38,16 @@ def show():
     
     with sub_tabs[1]:
         st.subheader("Volumes par Mois")
-        df_mois = fetch_data("/api/volumes_mois")
+        df_mois, time_mongo = fetch_data("/api/volumes_mois")
+        _, time_minio = get_minio_data("gold", "kpi_volumes_mois")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("MongoDB", f"{time_mongo:.0f}ms")
+        with col2:
+            st.metric("MinIO", f"{time_minio:.0f}ms")
+        
+        st.divider()
         
         if not df_mois.empty:
 
@@ -43,7 +61,16 @@ def show():
     
     with sub_tabs[2]:
         st.subheader("Volumes par an")
-        df_jour = fetch_data("/api/volumes_jour")
+        df_jour, time_mongo = fetch_data("/api/volumes_jour")
+        _, time_minio = get_minio_data("gold", "kpi_volumes_jour")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("MongoDB", f"{time_mongo:.0f}ms")
+        with col2:
+            st.metric("MinIO", f"{time_minio:.0f}ms")
+        
+        st.divider()
         
         if not df_jour.empty:
             if 'jour' in df_jour.columns:

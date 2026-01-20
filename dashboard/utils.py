@@ -12,18 +12,23 @@ from config import get_minio_client
 API_URL = "http://localhost:5000"
 
 
-def fetch_data(endpoint: str) -> pd.DataFrame:
+def fetch_data(endpoint: str) -> tuple[pd.DataFrame, float]:
+    start = time.time()
     try:
         response = requests.get(f"{API_URL}{endpoint}")
         if response.status_code == 200:
-            return pd.DataFrame(response.json())
+            df = pd.DataFrame(response.json())
+            elapsed = (time.time() - start) * 1000
+            return df, elapsed
     except requests.exceptions.ConnectionError:
         st.error("API not running. Please start the FastAPI server.")
     
-    return pd.DataFrame()
+    elapsed = (time.time() - start) * 1000
+    return pd.DataFrame(), elapsed
 
 
-def get_minio_data(bucket: str, prefix: str) -> pd.DataFrame:
+def get_minio_data(bucket: str, prefix: str) -> tuple[pd.DataFrame, float]:
+    start = time.time()
     try:
         client = get_minio_client()
         objects = list(client.list_objects(bucket, prefix=prefix, recursive=True))
@@ -47,12 +52,16 @@ def get_minio_data(bucket: str, prefix: str) -> pd.DataFrame:
                     pass
         
         if dataframes:
-            return pd.concat(dataframes, ignore_index=True)
+            result = pd.concat(dataframes, ignore_index=True)
+            elapsed = (time.time() - start) * 1000
+            return result, elapsed
         
-        return pd.DataFrame()
+        elapsed = (time.time() - start) * 1000
+        return pd.DataFrame(), elapsed
         
     except Exception as e:
-        return pd.DataFrame()
+        elapsed = (time.time() - start) * 1000
+        return pd.DataFrame(), elapsed
 
 
 def measure_api_time() -> float:

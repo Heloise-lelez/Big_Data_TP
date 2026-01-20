@@ -8,12 +8,18 @@ from utils import get_minio_data
 
 
 def show():
-    """Affiche l'onglet MinIO Data."""
     st.header("Exploration des données MinIO")
     
-
     selected_bucket = "gold"
-    df = get_minio_data(selected_bucket, "")
+    df, time_minio = get_minio_data(selected_bucket, "")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("MinIO (Gold complet)", f"{time_minio:.0f}ms")
+    with col2:
+        st.metric("MongoDB", "voir autres onglets")
+    
+    st.divider()
     
     if not df.empty:
 
